@@ -1,17 +1,19 @@
 apply plugin: "com.android.application"
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
     defaultConfig {
         applicationId "at.woodstick.mysampleapplication"
         testApplicationId "at.woodstick.mysampleapplication.test"
-        minSdkVersion 15
-        targetSdkVersion 25
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -20,39 +22,11 @@ android {
     }
 }
 
-//apply plugin: "info.solidsoft.pitest"
-//
-//pitest {
-//
-//    // Not needed when project.group property is set
-//    targetClasses = ["at.woodstick.mysampleapplication.*"]
-//
-//    targetTests = ["at.woodstick.mysampleapplication.test.*"]
-//
-//    mutators = [
-//        "INCREMENTS",
-//        "VOID_METHOD_CALLS",
-//        "RETURN_VALS",
-//        "MATH",
-//        "NEGATE_CONDITIONALS",
-//        "INVERT_NEGS",
-//        "CONDITIONALS_BOUNDARY",
-//        "REMOVE_CONDITIONALS"
-//    ]
-//
-//    exportLineCoverage = true
-//
-//    outputFormats = ["XML", "HTML"]
-//
-//    threads = 4
-//}
-
-
 dependencies {
     ext {
-        supportLibVersion = "25.3.0"
-        espressoVersion = "2.2.2"
-        robolectricVersion = "3.3.1"
+        supportLibVersion = rootProject.ext.supportLibVersion
+        espressoVersion = rootProject.ext.espressoVersion
+        robolectricVersion = rootProject.ext.robolectricVersion
     }
 
     compile fileTree(dir: "libs", include: ["*.jar"])

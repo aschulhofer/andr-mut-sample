@@ -2,12 +2,12 @@ apply plugin: "com.android.application"
 
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 25
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
@@ -17,20 +17,16 @@ android {
         main {
             res.srcDirs("../app/src/main/res")
             java.srcDirs("../app/src/main/java")
-        }
-
-        androidTest {
-//            java.srcDirs("../app/src/main/java")
-//            res.srcDirs("../app/src/main/res")
+            manifest.srcFile("../app/src/main/AndroidManifest.xml")
         }
     }
 }
 
 dependencies {
     ext {
-        supportLibVersion = "25.3.0"
-        espressoVersion = "2.2.2"
-        robolectricVersion = "3.3.1"
+        supportLibVersion = rootProject.ext.supportLibVersion
+        espressoVersion = rootProject.ext.espressoVersion
+        robolectricVersion = rootProject.ext.robolectricVersion
     }
 
     compile fileTree(dir: "libs", include: ["*.jar"])
@@ -62,13 +58,4 @@ dependencies {
     }
 
     testCompile "junit:junit:4.12"
-
-    // newest mockito2 is 2.7.19
-//    testCompile "org.mockito:mockito-core:1.10.19"
-
-    // for robolectric and sdk version not 21 or 22
-    // java.lang.NoClassDefFoundError: javax/microedition/khronos/opengles/GL
-//    testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1'
-
-//    testCompile "org.robolectric:robolectric:$robolectricVersion"
 }

@@ -1,4 +1,4 @@
-package at.woodstick.mysampleapplication.test.espresso;
+package at.woodstick.mysampleapplication.testlib.espresso;
 
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -17,8 +17,8 @@ import static android.support.test.espresso.intent.matcher.ComponentNameMatchers
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.toPackage;
-import static at.woodstick.mysampleapplication.test.util.EspressoUtils.clickButton;
-import static at.woodstick.mysampleapplication.test.util.EspressoUtils.enterText;
+import static at.woodstick.mysampleapplication.testlib.util.EspressoUtils.clickButton;
+import static at.woodstick.mysampleapplication.testlib.util.EspressoUtils.enterText;
 import static org.hamcrest.core.AllOf.allOf;
 
 /**

@@ -1,23 +1,28 @@
-apply plugin: "info.solidsoft.pitest"
+evaluationDependsOn(':app')
+
+apply plugin: "pl.droidsonroids.pitest"
+apply plugin: "com.android.application"
 
 pitest {
+    pitestVersion = "1.1.11"
 
-    mainSourceSets = [project.sourceSets.main]
+    mainSourceSets = [project(":app").android.sourceSets.main]
+//    testSourceSets = [project(":app").android.sourceSets.test]
 
     // Not needed when project.group property is set
     targetClasses = ["at.woodstick.mysampleapplication.*"]
 
-    targetTests = ["at.woodstick.mysampleapplication.test.*"]
+    targetTests = ["at.woodstick.mysampleapplication.*"]
 
     mutators = [
-        "INCREMENTS",
-        "VOID_METHOD_CALLS",
-        "RETURN_VALS",
-        "MATH",
-        "NEGATE_CONDITIONALS",
-        "INVERT_NEGS",
-        "CONDITIONALS_BOUNDARY",
-        "REMOVE_CONDITIONALS"
+            "INCREMENTS",
+            "VOID_METHOD_CALLS",
+            "RETURN_VALS",
+            "MATH",
+            "NEGATE_CONDITIONALS",
+            "INVERT_NEGS",
+            "CONDITIONALS_BOUNDARY",
+            "REMOVE_CONDITIONALS"
     ]
 
     exportLineCoverage = true
@@ -27,20 +32,40 @@ pitest {
     threads = 4
 }
 
-dependencies {
-    testCompile "junit:junit:4.12"
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    sourceSets {
+        main {
+            res.srcDirs("../app/src/main/res")
+            java.srcDirs("../app/src/main/java")
+            manifest.srcFile("../app/src/main/AndroidManifest.xml")
+        }
+
+        test {
+            java.srcDirs("../app/src/test/java")
+        }
+
+        androidTest {
+            setRoot('../app/src/androidTest')
+        }
+    }
 }
 
-task pitestBuild(dependsOn: ["pitest"])  {
-    description "Runs pitest and build task"
-}
-
-/*
 dependencies {
     ext {
-        supportLibVersion = "25.3.0"
-        espressoVersion = "2.2.2"
-        robolectricVersion = "3.3.1"
+        supportLibVersion = rootProject.ext.supportLibVersion
+        espressoVersion = rootProject.ext.espressoVersion
+        robolectricVersion = rootProject.ext.robolectricVersion
     }
 
     compile fileTree(dir: "libs", include: ["*.jar"])
@@ -67,6 +92,10 @@ dependencies {
 
     }
 
+    androidTestCompile ("com.android.support.test.espresso:espresso-intents:$espressoVersion") {
+
+    }
+
     testCompile "junit:junit:4.12"
 
     // newest mockito2 is 2.7.19
@@ -78,4 +107,3 @@ dependencies {
 
     testCompile "org.robolectric:robolectric:$robolectricVersion"
 }
-*/

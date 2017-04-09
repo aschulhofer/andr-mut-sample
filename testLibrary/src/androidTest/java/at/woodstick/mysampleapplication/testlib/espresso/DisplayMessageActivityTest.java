@@ -1,4 +1,4 @@
-package at.woodstick.mysampleapplication.test.espresso;
+package at.woodstick.mysampleapplication.testlib.espresso;
 
 import android.content.Intent;
 import android.support.test.rule.ActivityTestRule;
@@ -16,7 +16,7 @@ import at.woodstick.mysampleapplication.R;
 
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static at.woodstick.mysampleapplication.test.util.EspressoUtils.onViewWithId;
+import static at.woodstick.mysampleapplication.testlib.util.EspressoUtils.onViewWithId;
 
 /**
  *

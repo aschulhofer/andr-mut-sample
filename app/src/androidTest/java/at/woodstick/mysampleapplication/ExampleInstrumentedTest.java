@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        Assert.assertEquals("woodstick.at.mysampleapplication", appContext.getPackageName());
+        Assert.assertEquals("at.woodstick.mysampleapplication", appContext.getPackageName());
     }
 }

@@ -15,7 +15,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.core.IsNot.not;
 
 /**
- *
+ * APP
  */
 public final class EspressoUtils {
 

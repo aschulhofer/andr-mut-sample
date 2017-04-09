@@ -1,5 +1,35 @@
 apply plugin: "com.android.application"
 
+apply plugin: "pl.droidsonroids.pitest"
+
+pitest {
+    pitestVersion = "1.1.11"
+
+    mainSourceSets = [project(":app").android.sourceSets.main]
+
+    // Not needed when project.group property is set
+    targetClasses = ["at.woodstick.mysampleapplication.*"]
+
+    targetTests = ["at.woodstick.mysampleapplication.*"]
+
+    mutators = [
+            "INCREMENTS",
+            "VOID_METHOD_CALLS",
+            "RETURN_VALS",
+            "MATH",
+            "NEGATE_CONDITIONALS",
+            "INVERT_NEGS",
+            "CONDITIONALS_BOUNDARY",
+            "REMOVE_CONDITIONALS"
+    ]
+
+    exportLineCoverage = true
+
+    outputFormats = ["XML", "HTML"]
+
+    threads = 4
+}
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion

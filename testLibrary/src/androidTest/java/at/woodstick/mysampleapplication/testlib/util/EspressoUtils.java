@@ -1,4 +1,4 @@
-package at.woodstick.mysampleapplication.test.util;
+package at.woodstick.mysampleapplication.testlib.util;
 
 import android.app.Activity;
 import android.app.Instrumentation;

@@ -1,4 +1,4 @@
-package at.woodstick.mysampleapplication.test;
+package at.woodstick.mysampleapplication.testlib;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        Assert.assertEquals("woodstick.at.mysampleapplication", appContext.getPackageName());
+        Assert.assertEquals("at.woodstick.mysampleapplication", appContext.getPackageName());
     }
 }

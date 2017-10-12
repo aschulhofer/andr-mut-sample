@@ -66,40 +66,10 @@ android {
         }
     }
 
-//    buildTypes {
-//        mutant {
-//            applicationIdSuffix ".mutant"
-//        }
-//    }
-
-//    buildTypes.create("mutant1", {
-//        applicationIdSuffix ".mutant1"
-//    })
-
     testOptions {
         reportDir  "${project.reporting.baseDir.path}/test-reports"
         resultsDir "${project.reporting.baseDir.path}/test-results"
     }
-
-//    String packageDir  = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
-//
-//    FileTree mutants = fileTree(
-//            dir: "${pitest.reportDir}/debug/$packageDir",
-//            include: "**/mutants/**/*.class"
-//    )
-//    int numberMutants = 0;
-//
-//    mutants.each { File file ->
-//        numberMutants++;
-//
-//        println file.parentFile.parentFile.parentFile.getName()
-//        println file.parentFile.getName() + "\t" +  file.getName()
-//
-//        buildTypes.create("mutant" + numberMutants, {
-//            applicationIdSuffix ".mutant" + numberMutants
-//            debuggable true
-//        })
-//    }
 }
 
 dependencies {
@@ -233,12 +203,30 @@ class TestPlugin implements Plugin<Project> {
 
         project.extensions.create("greeting", TestPluginExtension)
 
-        project.task("hello") {
-            group 'testplugin'
+//        project.task("hello") {
+//            group 'testplugin'
+//
+//            doLast {
+//                println project.greeting.message + " " + project.greeting.wat + " " + project.greeting.numTasks
+//            }
+//        }
 
-            doLast {
-                println project.greeting.message + " " + project.greeting.wat + " " + project.greeting.numTasks
+        project.task("mutateAll") {
+
+            project.afterEvaluate {
+
+
+
+//                project.tasks.all {
+//                    if(it.name.startsWith("hello")) {
+//                        println it.name
+//                    }
+//                }
+
+
             }
+
+
         }
 
         project.task("createMutants") {
@@ -314,17 +302,44 @@ class TestPlugin implements Plugin<Project> {
             }
         }
 
+        project.task("afterMutantTest") {
+
+            ext {
+                mutantId = -1
+                mutantFile = null
+                mutantName = null
+            }
+
+            doLast {
+                println "Connected test against mutant finished."
+
+                FileTree testResult = project.fileTree(project.android.testOptions.resultsDir)
+
+                project.copy {
+                    from testResult.files
+                    into "${project.buildDir}/mutantion/result/$mutantName/$mutantId"
+                    include "**/*.xml"
+                }
+
+                project.copy {
+                    from "${project.buildDir}/intermediates/classes/debugOrg"
+                    into "${project.buildDir}/intermediates/classes/debug"
+                }
+            }
+
+        }
+
         project.afterEvaluate {
             println project.greeting.message + " " + project.greeting.wat + " " + project.greeting.numTasks
 
             project.tasks.compileDebugSources.finalizedBy project.tasks.mutateAfterCompile
+            project.tasks.connectedDebugAndroidTest.finalizedBy project.tasks.afterMutantTest
 
 //            project.greeting.numTasks.times { index ->
 //            getNumberMutants().times { index ->
             getMutants().eachWithIndex { File file, index ->
 
-                println "create task hello $index of ${project.greeting.numTasks}"
-                project.task("hello$index") {
+                def mutationTask = project.task("mutant$index") {
                     group 'testplugin'
 
                     ext {
@@ -336,15 +351,26 @@ class TestPlugin implements Plugin<Project> {
 
                         project.tasks.mutateAfterCompile.mutantFile = file
                         project.tasks.mutateAfterCompile.mutantId = index
+
+                        project.tasks.afterMutantTest.mutantName = file.getName()
+                        project.tasks.afterMutantTest.mutantFile = file
+                        project.tasks.afterMutantTest.mutantId = index
                     }
 
 //                    finalizedBy "assembleDebug"
-
 //                    finalizedBy "installDebug"
 
                     finalizedBy "connectedDebugAndroidTest"
                 }
+
+//                project.tasks.mutateAll.dependsOn mutationTask
             }
+
+//            project.tasks.mutant1.finalizedBy project.tasks.mutant9
+
+//            def mutationTasks = project.tasks.findAll { it.name.startsWith("mutant") }
+//            project.tasks.mutateAll.dependsOn mutationTasks
+//            println mutationTasks
         }
     }
 }
@@ -508,4 +534,22 @@ task testPackageToPath {
         println pathSegs.join("/") + ".class"
     }
 
+}
+
+
+task afterMutTest {
+    ext {
+        mutantName = "DisplayMessageActivity"
+        mutatntId = 1
+    }
+
+    doLast {
+        FileTree testResult = project.fileTree(project.android.testOptions.resultsDir)
+
+        copy {
+            from testResult.files
+            into "${project.buildDir}/mutantion/result/$mutantName/$mutatntId"
+            include "**/*.xml"
+        }
+    }
 }

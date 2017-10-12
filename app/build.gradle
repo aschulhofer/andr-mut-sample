@@ -1,34 +1,34 @@
 apply plugin: "com.android.application"
 
-apply plugin: "pl.droidsonroids.pitest"
+//apply plugin: "pl.droidsonroids.pitest"
 
-pitest {
-    pitestVersion = "1.1.11"
-
-    mainSourceSets = [project(":app").android.sourceSets.main]
-
-    // Not needed when project.group property is set
-    targetClasses = ["at.woodstick.mysampleapplication.*"]
-
-    targetTests = ["at.woodstick.mysampleapplication.*"]
-
-    mutators = [
-            "INCREMENTS",
-            "VOID_METHOD_CALLS",
-            "RETURN_VALS",
-            "MATH",
-            "NEGATE_CONDITIONALS",
-            "INVERT_NEGS",
-            "CONDITIONALS_BOUNDARY",
-            "REMOVE_CONDITIONALS"
-    ]
-
-    exportLineCoverage = true
-
-    outputFormats = ["XML", "HTML"]
-
-    threads = 4
-}
+//pitest {
+//    pitestVersion = "1.2.2"
+//
+//    mainSourceSets = [project(":app").android.sourceSets.main]
+//
+//    // Not needed when project.group property is set
+//    targetClasses = ["at.woodstick.mysampleapplication.*"]
+//
+//    targetTests = ["at.woodstick.mysampleapplication.*"]
+//
+//    mutators = [
+//            "INCREMENTS",
+//            "VOID_METHOD_CALLS",
+//            "RETURN_VALS",
+//            "MATH",
+//            "NEGATE_CONDITIONALS",
+//            "INVERT_NEGS",
+//            "CONDITIONALS_BOUNDARY",
+//            "REMOVE_CONDITIONALS"
+//    ]
+//
+//    exportLineCoverage = true
+//
+//    outputFormats = ["XML", "HTML", "CSV"]
+//
+//    threads = 4
+//}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -98,3 +98,28 @@ dependencies {
 
     testCompile "org.robolectric:robolectric:$robolectricVersion"
 }
+
+
+//task afterCompileSources {
+//    group 'build'
+//
+//    doFirst {
+//        println "compileSources done."
+//    }
+//
+//    doLast {
+//        println "afterCompileSources done."
+//    }
+//}
+//
+//gradle.projectsEvaluated {
+//
+//    println 'Gradle projects evaluated start.'
+//
+////    afterCompileSources.dependsOn compileDebugSources
+////    afterCompileSources.mustRunAfter compileDebugSources
+//
+//    compileDebugSources.finalizedBy afterCompileSources
+//
+//    println 'Gradle projects evaluated end.'
+//}

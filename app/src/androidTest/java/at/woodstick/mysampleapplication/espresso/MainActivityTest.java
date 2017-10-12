@@ -5,6 +5,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import static android.support.test.espresso.intent.matcher.IntentMatchers.hasCom
 import static android.support.test.espresso.intent.matcher.IntentMatchers.toPackage;
 import static at.woodstick.mysampleapplication.util.EspressoUtils.clickButton;
 import static org.hamcrest.core.AllOf.allOf;
+import static org.junit.Assert.fail;
 
 /**
  *
@@ -39,6 +41,12 @@ public class MainActivityTest {
     @After
     public void tearDown() {
 
+    }
+
+    @Ignore
+    @Test
+    public void fail_test() {
+        fail();
     }
 
     @Test

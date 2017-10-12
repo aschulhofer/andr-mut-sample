@@ -1,6 +1,8 @@
 package at.woodstick.mysampleapplication.test;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +11,7 @@ import static org.junit.Assert.*;
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
+@RunWith(BlockJUnit4ClassRunner.class)
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {

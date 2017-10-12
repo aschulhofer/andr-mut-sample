@@ -4,7 +4,7 @@ apply plugin: "pl.droidsonroids.pitest"
 apply plugin: "com.android.application"
 
 pitest {
-    pitestVersion = "1.1.11"
+    pitestVersion = "1.2.2"
 
     mainSourceSets = [project(":app").android.sourceSets.main]
 
@@ -32,6 +32,10 @@ pitest {
     outputFormats = ["XML", "HTML"]
 
     threads = 4
+
+    verbose = true
+
+    reportDir = "${project.reporting.baseDir.path}/pitest/custom"
 }
 
 android {
@@ -61,6 +65,41 @@ android {
             setRoot("../app/src/androidTest")
         }
     }
+
+//    buildTypes {
+//        mutant {
+//            applicationIdSuffix ".mutant"
+//        }
+//    }
+
+//    buildTypes.create("mutant1", {
+//        applicationIdSuffix ".mutant1"
+//    })
+
+    testOptions {
+        reportDir  "${project.reporting.baseDir.path}/test-reports"
+        resultsDir "${project.reporting.baseDir.path}/test-results"
+    }
+
+//    String packageDir  = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
+//
+//    FileTree mutants = fileTree(
+//            dir: "${pitest.reportDir}/debug/$packageDir",
+//            include: "**/mutants/**/*.class"
+//    )
+//    int numberMutants = 0;
+//
+//    mutants.each { File file ->
+//        numberMutants++;
+//
+//        println file.parentFile.parentFile.parentFile.getName()
+//        println file.parentFile.getName() + "\t" +  file.getName()
+//
+//        buildTypes.create("mutant" + numberMutants, {
+//            applicationIdSuffix ".mutant" + numberMutants
+//            debuggable true
+//        })
+//    }
 }
 
 dependencies {
@@ -108,4 +147,173 @@ dependencies {
     testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1'
 
     testCompile "org.robolectric:robolectric:$robolectricVersion"
+}
+
+
+//task pmutate(type: PitestTask) {
+//    doFirst {
+//        println "Report dir is ${pitest.reportDir}"
+//
+//        pitest.reportDir = "${project.reporting.baseDir.path}/pitest/custom"
+//        println "Report dir now is ${pitest.reportDir}"
+//    }
+//}
+
+task cand {
+    doFirst {
+        project.android.buildTypes.create("mutant", {
+            applicationIdSuffix ".mutant"
+        })
+    }
+
+    doLast {
+//        project.android.buildTypes.create("mutant", {
+//            applicationIdSuffix ".mutant"
+//        })
+    }
+
+    finalizedBy "assemble"
+}
+
+task mutate {
+    doFirst {
+        println "mutate ${project.reporting.baseDir.path}"
+
+//        pitest.reportDir = "${project.reporting.baseDir.path}/pitest/custom"
+
+        println "Report dir is ${pitest.reportDir}"
+    }
+
+    finalizedBy "pitestDebug"
+}
+
+task createMutantBuildTasks {
+
+    doFirst {
+
+    }
+
+    doLast {
+        String packageDirTask  = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
+        int numberMutantsTask = 0;
+
+        FileTree mutantsTask = fileTree(
+                dir: "${pitest.reportDir}/debug/$packageDirTask",
+                include: "**/mutants/**/*.class"
+        )
+
+        println "Build task apk for mutant ${pitest.reportDir}/debug/$packageDirTask"
+
+        mutantsTask.each { File file ->
+            numberMutantsTask++;
+
+            println "Build task apk for mutant $numberMutantsTask"
+
+            task "buildApkMutant$numberMutantsTask" {
+                group "mutate"
+
+                doLast {
+                    println "Build apk for mutant $numberMutantsTask"
+                }
+            }
+        }
+    }
+
+    dependsOn "mutate"
+}
+
+task preMutate {
+    doFirst {
+
+        // Backup compiled debug class files
+        copy {
+            from "${project.buildDir}/intermediates/classes/debug"
+            into "${project.buildDir}/intermediates/classes/debugOrg"
+        }
+
+        // Backup original debug apk
+        copy {
+            from "${project.buildDir}/outputs/apk/${project.name}-debug.apk"
+            into "${project.buildDir}/outputs/apk/"
+
+            include "${project.name}-debug.apk"
+
+            rename("${project.name}-debug.apk", "${project.name}-debug.org.apk")
+//            rename { String filename ->
+//                filename.replace("${project.name}-debug.apk", "${project.name}-debug.org.apk")
+//            }
+        }
+    }
+}
+
+task mutateApk {
+    doFirst {
+
+    }
+
+    doLast {
+        String packageDir  = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
+        int numberMutants = 0;
+
+        FileTree mutants = fileTree(
+            dir: "${pitest.reportDir}/debug/$packageDir",
+            include: "**/mutants/**/*.class"
+        )
+
+        mutants.each { File file ->
+            numberMutants++;
+            println "Mutant $numberMutants" + "\t" + file.parentFile.getName() + "\t" +  file.getName()
+
+            if(numberMutants == 1) {
+                println "Assemble Mutant $numberMutants" + "\t" + file.parentFile.getName() + "\t" +  file.getName()
+                tasks.assembleDebug.execut()
+            }
+        }
+    }
+}
+
+task afterCompileSources {
+    group 'build'
+
+    doFirst {
+        println "compileSources done."
+    }
+
+    doLast {
+        println "afterCompileSources done."
+    }
+}
+
+gradle.projectsEvaluated {
+
+    println 'Gradle projects evaluated start.'
+
+//    afterCompileSources.dependsOn compileDebugSources
+//    afterCompileSources.mustRunAfter compileDebugSources
+
+    compileDebugSources.finalizedBy afterCompileSources
+
+    println 'Gradle projects evaluated end.'
+}
+
+task listMutants {
+    doFirst {
+
+    }
+
+    doLast {
+        String packageDir  = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
+        int numberMutants = 0;
+
+        FileTree mutants = fileTree(
+            dir: "${pitest.reportDir}/debug/$packageDir",
+            include: "**/mutants/**/*.class"
+        )
+
+        mutants.each { File file ->
+            numberMutants++;
+
+            println "Mutant $numberMutants" + "\t" + file.parentFile.getName() + "\t" +  file.getName()
+        }
+    }
 }

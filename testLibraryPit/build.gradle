@@ -149,30 +149,204 @@ dependencies {
     testCompile "org.robolectric:robolectric:$robolectricVersion"
 }
 
+def getMutants() {
+    String packageDirTask  = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
 
-//task pmutate(type: PitestTask) {
-//    doFirst {
-//        println "Report dir is ${pitest.reportDir}"
-//
-//        pitest.reportDir = "${project.reporting.baseDir.path}/pitest/custom"
-//        println "Report dir now is ${pitest.reportDir}"
-//    }
-//}
+    FileTree mutantsTask = fileTree(
+            dir: "${pitest.reportDir}/debug/$packageDirTask",
+            include: "**/mutants/**/*.class"
+    )
 
-task cand {
-    doFirst {
-        project.android.buildTypes.create("mutant", {
-            applicationIdSuffix ".mutant"
-        })
+    return mutantsTask;
+}
+
+def getNumberMutants() {
+    return getMutants().getFiles().size()
+}
+
+apply plugin: TestPlugin
+
+greeting {
+    message = "Hi from Gradle"
+    wat = "wat wat"
+    numTasks = getNumberMutants()
+    packageDir = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
+    mutantsDir = "${pitest.reportDir}/debug/$packageDir"
+}
+
+class TestPluginExtension {
+    String message
+    String wat
+    int numTasks
+    String packageDir
+    String mutantsDir
+}
+
+class TestPlugin implements Plugin<Project> {
+
+    def Project target;
+
+    def getMutants() {
+        FileTree mutantsTask = target.fileTree(
+            dir: target.greeting.mutantsDir,
+            include: "**/mutants/**/*.class"
+        )
+
+        return mutantsTask;
     }
 
-    doLast {
-//        project.android.buildTypes.create("mutant", {
-//            applicationIdSuffix ".mutant"
-//        })
+    def getNumberMutants() {
+        return getMutants().getFiles().size()
     }
 
-    finalizedBy "assemble"
+    def classFileNameToRelativePackagePath(def className) {
+        def pathSegs = className.split("\\.")
+
+        // remove class segment and file name
+        pathSegs = (pathSegs - pathSegs[-1] - pathSegs[-2])
+
+        return pathSegs.join("/")
+    }
+
+    def classFileNameWithoutRelativePackagePath(def className) {
+        def pathSegs = className.split("\\.")
+        return pathSegs[-2] + "." + pathSegs[-1]
+    }
+
+    def getTargetFileInfoFromMutantClass(def className) {
+        def pathSegs = className.split("\\.")
+
+        def fileName = pathSegs[-2] + "." + pathSegs[-1];
+
+        // remove class segment and file name
+        pathSegs = (pathSegs - pathSegs[-1] - pathSegs[-2])
+
+        def filePath = pathSegs.join("/")
+
+        return [name: fileName, path: filePath]
+    }
+
+    @Override
+    void apply(Project project) {
+
+        this.target = project;
+
+        project.extensions.create("greeting", TestPluginExtension)
+
+        project.task("hello") {
+            group 'testplugin'
+
+            doLast {
+                println project.greeting.message + " " + project.greeting.wat + " " + project.greeting.numTasks
+            }
+        }
+
+        project.task("createMutants") {
+            group 'testplugin'
+
+            dependsOn "pitestDebug"
+
+            doLast {
+                println "mutants ready."
+            }
+        }
+
+        project.task("mutantsList") {
+            group 'testplugin'
+
+            doLast {
+                int numberMutants = 0;
+
+//                FileTree mutants = project.fileTree(
+//                    dir: project.greeting.mutantsDir,
+//                    include: "**/mutants/**/*.class"
+//                )
+
+                FileTree mutants = getMutants()
+
+                mutants.each { File file ->
+                    numberMutants++;
+
+                    println "Mutant $numberMutants" + "\t" + file.parentFile.getName() + "\t" +  file.getName()
+
+                }
+            }
+        }
+
+        project.task("mutateAfterCompile") {
+            ext {
+                mutantId = -1
+                mutantFile = null
+            }
+
+            doFirst {
+                println "compileSources done."
+            }
+
+            doLast {
+                def mutantTargetFileName = classFileNameWithoutRelativePackagePath(mutantFile.getName());
+                def mutantTargetRelPath = classFileNameToRelativePackagePath(mutantFile.getName());
+
+                def targetFileInfo = getTargetFileInfoFromMutantClass(mutantFile.getName())
+
+                println "Copy mutant class over debug class"
+                println "Mutant file: ${mutantFile.getName()}"
+
+//                println "Target file name: $mutantTargetFileName"
+//                println "Target file path: $mutantTargetRelPath"
+
+                println "Target file name: ${targetFileInfo.name}"
+                println "Target file path: ${targetFileInfo.path}"
+
+//                println mutantFile.absolutePath
+//                println mutantFile.parentFile.absolutePath
+//                println "${project.buildDir}/intermediates/classes/debug/${targetFileInfo.path}"
+
+                target.copy {
+                    from mutantFile.parentFile.absolutePath
+                    into "${project.buildDir}/intermediates/classes/debug/${targetFileInfo.path}"
+
+                    include mutantFile.getName()
+                    rename(mutantFile.getName(), targetFileInfo.name)
+                }
+
+                println "mutateAfterCompile done for mutant $mutantId."
+            }
+        }
+
+        project.afterEvaluate {
+            println project.greeting.message + " " + project.greeting.wat + " " + project.greeting.numTasks
+
+            project.tasks.compileDebugSources.finalizedBy project.tasks.mutateAfterCompile
+
+//            project.greeting.numTasks.times { index ->
+//            getNumberMutants().times { index ->
+            getMutants().eachWithIndex { File file, index ->
+
+                println "create task hello $index of ${project.greeting.numTasks}"
+                project.task("hello$index") {
+                    group 'testplugin'
+
+                    ext {
+                        idx = index
+                    }
+
+                    doLast {
+                        println project.greeting.message + " ($index == $idx), " + file.getName()
+
+                        project.tasks.mutateAfterCompile.mutantFile = file
+                        project.tasks.mutateAfterCompile.mutantId = index
+                    }
+
+//                    finalizedBy "assembleDebug"
+
+//                    finalizedBy "installDebug"
+
+                    finalizedBy "connectedDebugAndroidTest"
+                }
+            }
+        }
+    }
 }
 
 task mutate {
@@ -316,4 +490,22 @@ task listMutants {
             println "Mutant $numberMutants" + "\t" + file.parentFile.getName() + "\t" +  file.getName()
         }
     }
+}
+
+
+task testPackageToPath {
+
+    def className = "at.woodstick.mysampleapplication.DisplayMessageActivity.class"
+
+    doLast {
+        def pathSegs = className.split("\\.")
+        pathSegs = (pathSegs - pathSegs[-1])
+
+        pathSegs.each { val ->
+            println "value: $val"
+        }
+
+        println pathSegs.join("/") + ".class"
+    }
+
 }

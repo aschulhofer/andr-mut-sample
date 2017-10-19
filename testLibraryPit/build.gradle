@@ -212,21 +212,18 @@ class TestPlugin implements Plugin<Project> {
 //        }
 
         project.task("mutateAll") {
+            doLast {
+                def gs = new GroovyShell()
 
-            project.afterEvaluate {
-
-
-
-//                project.tasks.all {
-//                    if(it.name.startsWith("hello")) {
-//                        println it.name
-//                    }
-//                }
-
-
+                gs.run(
+                    project.file("src/main/groovy/hw.groovy"),
+                    [
+                        project.file("../gradlew.bat").path,
+                        getNumberMutants().toString(),
+                        true.toString()
+                    ]
+                )
             }
-
-
         }
 
         project.task("createMutants") {
@@ -329,15 +326,42 @@ class TestPlugin implements Plugin<Project> {
 
         }
 
+//        String packageDirTask  = "at/woodstick/mysampleapplication"
+//        FileTree muts = project.fileTree(
+//            dir: "${project.pitest.reportDir}/debug/$packageDirTask",
+//            include: "**/mutants/**/*.class"
+//        )
+//        muts.eachWithIndex { File file, index ->
+//            project.android.buildTypes.create("vmutant" + index, {
+//                applicationIdSuffix ".vmutant" + index
+//                debuggable true
+//            })
+//        }
+
         project.afterEvaluate {
             println project.greeting.message + " " + project.greeting.wat + " " + project.greeting.numTasks
 
             project.tasks.compileDebugSources.finalizedBy project.tasks.mutateAfterCompile
             project.tasks.connectedDebugAndroidTest.finalizedBy project.tasks.afterMutantTest
 
+//            def previousMutationTask = null
+
 //            project.greeting.numTasks.times { index ->
 //            getNumberMutants().times { index ->
             getMutants().eachWithIndex { File file, index ->
+
+//                project.android.buildTypes.create("mutant" + index, {
+//                    applicationIdSuffix ".mutant" + index
+//                    debuggable true
+//                })
+
+//                def afterMutationTask = project.task("afterMutant$index") {
+//                    group 'testplugin'
+//
+//                    doLast {
+//                        println "After mutant $index"
+//                    }
+//                }
 
                 def mutationTask = project.task("mutant$index") {
                     group 'testplugin'
@@ -364,7 +388,20 @@ class TestPlugin implements Plugin<Project> {
                 }
 
 //                project.tasks.mutateAll.dependsOn mutationTask
+
+
+//                mutationTask.finalizedBy afterMutationTask
+//
+//                if(previousMutationTask != null) {
+//                    previousMutationTask.finalizedBy mutationTask
+//                }
+//
+//                previousMutationTask = afterMutationTask
             }
+
+//            project.tasks.mutateAll.dependsOn previousMutationTask
+
+//            previousMutationTask.finalizedBy project.tasks.mutateAll
 
 //            project.tasks.mutant1.finalizedBy project.tasks.mutant9
 

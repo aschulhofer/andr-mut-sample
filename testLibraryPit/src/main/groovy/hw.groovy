@@ -27,7 +27,7 @@ if(args.length > 0) {
             process.inputStream.eachLine {println it}
         }
         else {
-            println proc.text
+            println process.text
         }
 
         println sb.toString()

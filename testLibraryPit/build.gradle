@@ -1,22 +1,23 @@
 evaluationDependsOn(':app')
 
-apply plugin: "pl.droidsonroids.pitest"
 apply plugin: "com.android.application"
+apply plugin: "at.woodstick.pimutdroid"
 
-pitest {
-    pitestVersion = "1.2.2"
+pimut {
+    pitest {
+        pitestVersion = "1.2.2"
 
-    mainSourceSets = [project(":app").android.sourceSets.main]
+        mainSourceSets = [project(":app").android.sourceSets.main]
 
-    // Not supported in pit gradle plugin android fork
+        // Not supported in pit gradle plugin android fork
 //    testSourceSets = [project(":app").android.sourceSets.test]
 
-    // Not needed when project.group property is set
-    targetClasses = ["at.woodstick.mysampleapplication.*"]
+        // Not needed when project.group property is set
+        targetClasses = ["at.woodstick.mysampleapplication.*"]
 
-    targetTests = ["at.woodstick.mysampleapplication.*"]
+        targetTests = ["at.woodstick.mysampleapplication.*"]
 
-    mutators = [
+        mutators = [
             "INCREMENTS",
             "VOID_METHOD_CALLS",
             "RETURN_VALS",
@@ -25,17 +26,22 @@ pitest {
             "INVERT_NEGS",
             "CONDITIONALS_BOUNDARY",
             "REMOVE_CONDITIONALS"
-    ]
+        ]
 
-    exportLineCoverage = true
+        exportLineCoverage = true
 
-    outputFormats = ["XML", "HTML"]
+        outputFormats = ["XML", "HTML"]
 
-    threads = 4
+        threads = 4
 
-    verbose = true
+        verbose = true
 
-    reportDir = "${project.reporting.baseDir.path}/pitest/custom"
+        reportDir = "${project.reporting.baseDir.path}/pitest/custom"
+    }
+
+    packageDir = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
+    mutantsDir = "${pitest.reportDir}/debug/$packageDir"
+    outputMutateAll = true
 }
 
 android {
@@ -117,14 +123,6 @@ dependencies {
     testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1'
 
     testCompile "org.robolectric:robolectric:$robolectricVersion"
-}
-
-apply plugin: "at.woodstick.pimutdroid"
-
-pimut {
-    packageDir = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
-    mutantsDir = "${pitest.reportDir}/debug/$packageDir"
-    outputMutateAll = true
 }
 
 task("tmutateAll") {

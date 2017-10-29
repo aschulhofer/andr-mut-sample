@@ -3,6 +3,12 @@ evaluationDependsOn(':app')
 apply plugin: "com.android.application"
 apply plugin: "at.woodstick.pimutdroid"
 
+ext {
+    pimutMaxFirstMutants = project.hasProperty('pimutMaxFirstMutants') ? project.getProperty('pimutMaxFirstMutants') as int : null
+}
+
+println "Max f muts: ${project.ext.pimutMaxFirstMutants}"
+
 pimut {
     pitest {
         pitestVersion = "1.2.2"
@@ -42,6 +48,7 @@ pimut {
     packageDir = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
     mutantsDir = "${pitest.reportDir}/debug/$packageDir"
     outputMutateAll = true
+    maxFirstMutants = project.ext.pimutMaxFirstMutants
 }
 
 android {
@@ -139,3 +146,17 @@ task("tmutateAll") {
         )
     }
 }
+
+//gradle.taskGraph.whenReady { graph ->
+//
+//    def mutantTasks = graph.getAllTasks().findAll {
+//        it.name.startsWith("mutant")
+//    }
+//
+//    mutantTasks.each { println it.name }
+//
+//    if(!mutantTasks.isEmpty()) {
+//        project.tasks.mutateAfterCompile.enabled = false
+//        project.tasks.afterMutantTest.enabled = false
+//    }
+//}

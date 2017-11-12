@@ -23,28 +23,23 @@ android {
 }
 
 dependencies {
-    ext {
-        supportLibVersion = rootProject.ext.supportLibVersion
-        espressoVersion = rootProject.ext.espressoVersion
-        robolectricVersion = rootProject.ext.robolectricVersion
-    }
 
-    compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:$supportLibVersion"
-    compile "com.android.support.constraint:constraint-layout:1.0.2"
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
+    implementation "com.android.support.constraint:constraint-layout:1.0.2"
 
-    androidTestCompile "com.android.support:support-annotations:$supportLibVersion"
+    androidTestImplementation "com.android.support:support-annotations:$supportLibVersion"
 
-    androidTestCompile ("com.android.support.test:rules:0.5") {
+    androidTestImplementation ("com.android.support.test:rules:0.5") {
         exclude group: "com.android.support", module: "support-annotations"
     }
-    androidTestCompile ("com.android.support.test:runner:0.5") {
+    androidTestImplementation ("com.android.support.test:runner:0.5") {
         exclude group: "com.android.support", module: "support-annotations"
     }
-    androidTestCompile ("com.android.support.test.espresso:espresso-core:$espressoVersion") {
+    androidTestImplementation ("com.android.support.test.espresso:espresso-core:$espressoVersion") {
         exclude group: "com.android.support", module: "support-annotations"
     }
-    androidTestCompile ("com.android.support.test.espresso:espresso-contrib:$espressoVersion") {
+    androidTestImplementation ("com.android.support.test.espresso:espresso-contrib:$espressoVersion") {
         exclude group: "com.android.support", module: "support-annotations"
         exclude module: "support-v4"
         exclude module: "support-v13"
@@ -53,9 +48,9 @@ dependencies {
 
     }
 
-    androidTestCompile ("com.android.support.test.espresso:espresso-intents:$espressoVersion") {
+    androidTestImplementation ("com.android.support.test.espresso:espresso-intents:$espressoVersion") {
 
     }
 
-    testCompile "junit:junit:4.12"
+    testImplementation "junit:junit:4.12"
 }

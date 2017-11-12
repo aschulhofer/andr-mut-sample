@@ -1,35 +1,5 @@
 apply plugin: "com.android.application"
 
-//apply plugin: "pl.droidsonroids.pitest"
-
-//pitest {
-//    pitestVersion = "1.2.2"
-//
-//    mainSourceSets = [project(":app").android.sourceSets.main]
-//
-//    // Not needed when project.group property is set
-//    targetClasses = ["at.woodstick.mysampleapplication.*"]
-//
-//    targetTests = ["at.woodstick.mysampleapplication.*"]
-//
-//    mutators = [
-//            "INCREMENTS",
-//            "VOID_METHOD_CALLS",
-//            "RETURN_VALS",
-//            "MATH",
-//            "NEGATE_CONDITIONALS",
-//            "INVERT_NEGS",
-//            "CONDITIONALS_BOUNDARY",
-//            "REMOVE_CONDITIONALS"
-//    ]
-//
-//    exportLineCoverage = true
-//
-//    outputFormats = ["XML", "HTML", "CSV"]
-//
-//    threads = 4
-//}
-
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -50,6 +20,12 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -59,22 +35,22 @@ dependencies {
         robolectricVersion = rootProject.ext.robolectricVersion
     }
 
-    compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:$supportLibVersion"
-    compile "com.android.support.constraint:constraint-layout:1.0.2"
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
+    implementation "com.android.support.constraint:constraint-layout:1.0.2"
 
-    androidTestCompile "com.android.support:support-annotations:$supportLibVersion"
+    androidTestImplementation "com.android.support:support-annotations:$supportLibVersion"
 
-    androidTestCompile ("com.android.support.test:rules:0.5") {
+    androidTestImplementation ("com.android.support.test:rules:0.5") {
         exclude group: "com.android.support", module: "support-annotations"
     }
-    androidTestCompile ("com.android.support.test:runner:0.5") {
+    androidTestImplementation ("com.android.support.test:runner:0.5") {
         exclude group: "com.android.support", module: "support-annotations"
     }
-    androidTestCompile ("com.android.support.test.espresso:espresso-core:$espressoVersion") {
+    androidTestImplementation ("com.android.support.test.espresso:espresso-core:$espressoVersion") {
         exclude group: "com.android.support", module: "support-annotations"
     }
-    androidTestCompile ("com.android.support.test.espresso:espresso-contrib:$espressoVersion") {
+    androidTestImplementation ("com.android.support.test.espresso:espresso-contrib:$espressoVersion") {
         exclude group: "com.android.support", module: "support-annotations"
         exclude module: "support-v4"
         exclude module: "support-v13"
@@ -83,43 +59,18 @@ dependencies {
 
     }
 
-    androidTestCompile ("com.android.support.test.espresso:espresso-intents:$espressoVersion") {
+    androidTestImplementation ("com.android.support.test.espresso:espresso-intents:$espressoVersion") {
 
     }
 
-    testCompile "junit:junit:4.12"
+    testImplementation "junit:junit:4.12"
 
     // newest mockito2 is 2.7.19
-    testCompile "org.mockito:mockito-core:1.10.19"
+    testImplementation "org.mockito:mockito-core:1.10.19"
 
     // for robolectric and sdk version not 21 or 22
     // java.lang.NoClassDefFoundError: javax/microedition/khronos/opengles/GL
-    testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1'
+    testImplementation 'org.khronos:opengl-api:gl1.1-android-2.1_r1'
 
-    testCompile "org.robolectric:robolectric:$robolectricVersion"
+    testImplementation "org.robolectric:robolectric:$robolectricVersion"
 }
-
-
-//task afterCompileSources {
-//    group 'build'
-//
-//    doFirst {
-//        println "compileSources done."
-//    }
-//
-//    doLast {
-//        println "afterCompileSources done."
-//    }
-//}
-//
-//gradle.projectsEvaluated {
-//
-//    println 'Gradle projects evaluated start.'
-//
-////    afterCompileSources.dependsOn compileDebugSources
-////    afterCompileSources.mustRunAfter compileDebugSources
-//
-//    compileDebugSources.finalizedBy afterCompileSources
-//
-//    println 'Gradle projects evaluated end.'
-//}

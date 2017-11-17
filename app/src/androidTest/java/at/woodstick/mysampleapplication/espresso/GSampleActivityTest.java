@@ -12,13 +12,17 @@ import org.junit.runner.RunWith;
 import at.woodstick.mysampleapplication.GSampleActivity;
 import at.woodstick.mysampleapplication.R;
 
+import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.ComponentNameMatchers.hasShortClassName;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.toPackage;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static at.woodstick.mysampleapplication.util.EspressoUtils.clickButton;
 import static at.woodstick.mysampleapplication.util.EspressoUtils.enterText;
+import static at.woodstick.mysampleapplication.util.EspressoUtils.onViewWithId;
 import static org.hamcrest.core.AllOf.allOf;
 
 /**
@@ -51,6 +55,8 @@ public class GSampleActivityTest {
 
         clickButton(R.id.button_send_message);
 
+        onViewWithId(R.id.messageInputTextView).check(doesNotExist());
+
         intended(
             allOf(
                 hasComponent(hasShortClassName(ACTIVITY_CLASS_SHORTNAME_DISPLAYMESSAGE)),
@@ -64,12 +70,6 @@ public class GSampleActivityTest {
     public void typeNoText_click_InitiatesActivity() {
         clickButton(R.id.button_send_message);
 
-        intended(
-            allOf(
-                hasComponent(hasShortClassName(ACTIVITY_CLASS_SHORTNAME_DISPLAYMESSAGE)),
-                toPackage(PACKAGE_NAME),
-                hasExtra(GSampleActivity.EXTRA_MESSAGE, "")
-            )
-        );
+        onViewWithId(R.id.messageInputTextView).check(matches(isDisplayed()));
     }
 }

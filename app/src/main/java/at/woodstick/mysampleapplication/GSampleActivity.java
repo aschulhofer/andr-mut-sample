@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class GSampleActivity extends AppCompatActivity {
 
@@ -19,9 +20,33 @@ public class GSampleActivity extends AppCompatActivity {
     /** Called when the user taps the Send button */
     public void sendMessage(View view) {
         Intent intent = new Intent(this, DisplayMessageActivity.class);
-        EditText editText = (EditText) findViewById(R.id.editText);
-        String message = editText.getText().toString();
-        intent.putExtra(EXTRA_MESSAGE, message);
-        startActivity(intent);
+        final TextView messageLabel = (TextView) findViewById(R.id.messageInputTextView);
+        final EditText editText = (EditText) findViewById(R.id.editText);
+        final Message message = new Message(editText.getText().toString());
+
+        if(message.isAvailable()) {
+            messageLabel.setVisibility(View.INVISIBLE);
+
+            intent.putExtra(EXTRA_MESSAGE, message.getMessage());
+            startActivity(intent);
+        } else {
+            messageLabel.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public class Message {
+        private final String message;
+
+        public Message(String message) {
+            this.message = message;
+        }
+
+        public boolean isAvailable() {
+            return ( (message != null) && !message.isEmpty() );
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }

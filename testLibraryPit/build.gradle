@@ -7,8 +7,6 @@ ext {
     pimutMaxFirstMutants = project.hasProperty('pimutMaxFirstMutants') ? project.getProperty('pimutMaxFirstMutants') as int : null
 }
 
-println "Max f muts: ${project.ext.pimutMaxFirstMutants}"
-
 pimut {
     pitest {
         pitestVersion = "1.2.2"
@@ -43,14 +41,17 @@ pimut {
         verbose = true
 
         reportDir = "${project.reporting.baseDir.path}/pitest/custom"
+
+        maxMutationsPerClass = 0
     }
 
-    packageDir = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
-    mutantsDir = "${pitest.reportDir}/debug/$packageDir"
+//    packageDir = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
+//    mutantsDir = "${pitest.reportDir}/debug/$packageDir"
     outputMutateAll = true
     maxFirstMutants = project.ext.pimutMaxFirstMutants
-
-    outputDir = "${project.buildDir}/mutres"
+    skipInnerClasses = false
+    outputMutantCreation = false
+    //outputDir = "${project.buildDir}/mutres"
 }
 
 android {
@@ -58,6 +59,8 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
+        applicationId project(":app").android.defaultConfig.applicationId
+        testApplicationId project(":app").android.defaultConfig.testApplicationId
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -85,7 +88,6 @@ android {
         reportDir  "${project.reporting.baseDir.path}/test-reports"
         resultsDir "${project.reporting.baseDir.path}/test-results"
     }
-    buildToolsVersion '26.0.2'
 }
 
 dependencies {

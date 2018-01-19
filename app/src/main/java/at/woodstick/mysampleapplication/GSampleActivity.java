@@ -36,9 +36,11 @@ public class GSampleActivity extends AppCompatActivity {
 
     public class Message {
         private final String message;
+        private final MsgHolder msgHolder;
 
         public Message(String message) {
             this.message = message;
+            msgHolder = new MsgHolder(message);
         }
 
         public boolean isAvailable() {
@@ -47,6 +49,22 @@ public class GSampleActivity extends AppCompatActivity {
 
         public String getMessage() {
             return message;
+        }
+
+        public String emptyIfNull() {
+            return msgHolder.emptyIfNull();
+        }
+
+        public class MsgHolder {
+            private final String message;
+
+            public MsgHolder(String message) {
+                this.message = message;
+            }
+
+            public String emptyIfNull() {
+                return this.message == null ? "" : this.message;
+            }
         }
     }
 }

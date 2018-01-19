@@ -17,7 +17,13 @@ pimut {
 //    testSourceSets = [project(":app").android.sourceSets.test]
 
         // Not needed when project.group property is set
-        targetClasses = ["at.woodstick.mysampleapplication.*"]
+//        targetClasses = ["at.woodstick.mysampleapplication.*"]
+        targetClasses = [
+//            "at.woodstick.mysampleapplication.GSampleActivity",
+//            "at.woodstick.mysampleapplication.MainActivity",
+
+            "at.woodstick.mysampleapplication.*",
+        ]
 
         targetTests = ["at.woodstick.mysampleapplication.*"]
 
@@ -45,13 +51,37 @@ pimut {
         maxMutationsPerClass = 0
     }
 
+    instrumentationTestOptions {
+        targetTests {
+            packages = [
+                "at.woodstick.mysampleapplication.espresso",
+            ]
+//            classes = [
+//                "at.woodstick.mysampleapplication.espresso.MainActivityTest",
+//                "at.woodstick.mysampleapplication.espresso.DisplayMessageActivityTest",
+//            ]
+        }
+
+        targetMutants = [
+//            "at.woodstick.mysampleapplication.GSampleActivity",
+//            "at.woodstick.mysampleapplication.MainActivity",
+
+//            "at.woodstick.mysampleapplication.MainActivity",
+//            "at.woodstick.mysampleapplication.util.*",
+            "at.woodstick.mysampleapplication.*",
+        ]
+    }
+
+
+
 //    packageDir = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
 //    mutantsDir = "${pitest.reportDir}/debug/$packageDir"
+//    outputDir = "${project.buildDir}/mutres"
+
     outputMutateAll = true
-    maxFirstMutants = project.ext.pimutMaxFirstMutants
-    skipInnerClasses = false
+//    maxFirstMutants = project.ext.pimutMaxFirstMutants
+//    skipInnerClasses = false
     outputMutantCreation = false
-    //outputDir = "${project.buildDir}/mutres"
 }
 
 android {
@@ -84,41 +114,23 @@ android {
         }
     }
 
-    testOptions {
-        reportDir  "${project.reporting.baseDir.path}/test-reports"
-        resultsDir "${project.reporting.baseDir.path}/test-results"
-    }
+//    testOptions {
+//        reportDir  "${project.reporting.baseDir.path}/test-reports"
+//        resultsDir "${project.reporting.baseDir.path}/test-results"
+//    }
 }
 
 dependencies {
-
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
     implementation "com.android.support.constraint:constraint-layout:1.0.2"
 
     androidTestImplementation "com.android.support:support-annotations:$supportLibVersion"
-
-    androidTestImplementation ("com.android.support.test:rules:0.5") {
-        exclude group: "com.android.support", module: "support-annotations"
-    }
-    androidTestImplementation ("com.android.support.test:runner:0.5") {
-        exclude group: "com.android.support", module: "support-annotations"
-    }
-    androidTestImplementation ("com.android.support.test.espresso:espresso-core:$espressoVersion") {
-        exclude group: "com.android.support", module: "support-annotations"
-    }
-    androidTestImplementation ("com.android.support.test.espresso:espresso-contrib:$espressoVersion") {
-        exclude group: "com.android.support", module: "support-annotations"
-        exclude module: "support-v4"
-        exclude module: "support-v13"
-        exclude module: "recyclerview-v7"
-        exclude module: "design"
-
-    }
-
-    androidTestImplementation ("com.android.support.test.espresso:espresso-intents:$espressoVersion") {
-
-    }
+    androidTestImplementation "com.android.support.test:rules:$supportTestVersion"
+    androidTestImplementation "com.android.support.test:runner:$supportTestVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$espressoVersion"
 
     testImplementation "junit:junit:4.12"
 
@@ -132,40 +144,40 @@ dependencies {
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
 }
 
-task("tmutateAll") {
-    doLast {
-        def gs = new GroovyShell()
-
-        gs.run(
-            file("src/main/groovy/hw.groovy"),
-            [
-                file("../gradlew.bat").path,
-                getNumberMutants().toString(),
-                true.toString()
-            ]
-        )
-    }
-}
-
-
-task amt {
-    doLast {
-        println "Ouput dir: ${pimut.outputDir}"
-
-        def resultFile = project.fileTree(dir: "${pimut.outputDir}/debug", include: "*.xml").first()
-
-        def resultXml = new XmlSlurper().parse(resultFile)
-
-        def numTests    = resultXml['@tests']
-        def numFailures = resultXml['@failures']
-        def numErrors   = resultXml['@errors']
-        def numSkipped  = resultXml['@skipped']
-
-        println "Result file: ${resultFile.getName()}"
-        println "Test: ${numTests}, failures: ${numFailures}, errors: ${numErrors}, skipped: ${numSkipped}"
-    }
-}
-
+//task("tmutateAll") {
+//    doLast {
+//        def gs = new GroovyShell()
+//
+//        gs.run(
+//            file("src/main/groovy/hw.groovy"),
+//            [
+//                file("../gradlew.bat").path,
+//                getNumberMutants().toString(),
+//                true.toString()
+//            ]
+//        )
+//    }
+//}
+//
+//
+//task amt {
+//    doLast {
+//        println "Ouput dir: ${pimut.outputDir}"
+//
+//        def resultFile = project.fileTree(dir: "${pimut.outputDir}/debug", include: "*.xml").first()
+//
+//        def resultXml = new XmlSlurper().parse(resultFile)
+//
+//        def numTests    = resultXml['@tests']
+//        def numFailures = resultXml['@failures']
+//        def numErrors   = resultXml['@errors']
+//        def numSkipped  = resultXml['@skipped']
+//
+//        println "Result file: ${resultFile.getName()}"
+//        println "Test: ${numTests}, failures: ${numFailures}, errors: ${numErrors}, skipped: ${numSkipped}"
+//    }
+//}
+//
 //gradle.taskGraph.whenReady { graph ->
 //
 //    def mutantTasks = graph.getAllTasks().findAll {
@@ -177,5 +189,174 @@ task amt {
 //    if(!mutantTasks.isEmpty()) {
 //        project.tasks.mutateAfterCompile.enabled = false
 //        project.tasks.afterMutantTest.enabled = false
+//    }
+//}
+//
+//task cicm {
+//    doLast {
+//        FileTree mutantsTask = project.fileTree(
+//            dir: "${pitest.reportDir}/debug",
+//            include: "at/woodstick/mysampleapplication/MainActivity"
+//        )
+//
+//        mutantsTask.each { println "$it"}
+//
+//        println "files"
+//        files("${pitest.reportDir}/debug/at/woodstick/mysampleapplication").asList().each  { println "$it"}
+//
+//        println " "
+//        println "file"
+//        file("${pitest.reportDir}/debug/at/woodstick/mysampleapplication").listFiles().each { println it }
+//
+//        println " "
+//        println "file \\\$"
+//        file("${pitest.reportDir}/debug/at/woodstick/mysampleapplication").listFiles()
+//        .findAll { file ->
+//            print file.getName()
+//            if(file.getName().matches(/(.*)\$(.*)/)) {
+//                println "\t- matches"
+//                return file
+//            }
+//            else {
+//                println "\t - no match"
+//            }
+//        }
+//        .each { file ->
+//
+//            def parentClassName = file.getName().replaceAll(/\$(.*)/, "");
+//            def moveTarget = file.getParentFile().toPath().resolve(parentClassName)
+//
+//            println "$file \t ${file.getName()} \t ${moveTarget}"
+//
+//            copy {
+//                from file.getParentFile()
+//                into moveTarget
+//                include file.getName() + "/**"
+//            }
+//
+//            file.deleteDir()
+//        }
+//    }
+//
+//}
+//
+//task devt {
+//    doLast {
+//
+//        def extensionTargetMutants = ["at.woodstick.mysampleapplication.DisplayMessageActivity", "at.woodstick.mysampleapplication.MainActivity"];
+////        def extensionTargetMutants = []
+//        def mutationClassGlob = "**/mutants/**/*.class"
+//
+//        def includes
+//
+//        if(extensionTargetMutants == null || extensionTargetMutants.empty) {
+//            includes = [mutationClassGlob]
+//        }
+//        else {
+//            includes = extensionTargetMutants.collect { mutantGlob ->
+//                mutantGlob = mutantGlob.replaceAll("\\.", "/") + "/" + mutationClassGlob
+//                mutantGlob
+//            }
+//        }
+//
+//        println "Include mutants $includes"
+//
+//        FileTree mutantsTask = project.fileTree(
+//            dir: "${pitest.reportDir}/debug",
+//            includes: includes
+//        )
+//
+//        mutantsTask.each { println "$it"}
+//    }
+//
+//}
+//
+//task cdadb(type: Exec) {
+//    File adbExe = project.android.getAdbExecutable()
+//
+//    commandLine adbExe, "devices", "-l"
+//
+//    standardOutput = new ByteArrayOutputStream()
+//
+//    doLast {
+//        logger.quiet "$adbExe"
+//        logger.quiet "=============================="
+//        logger.quiet standardOutput.toString("UTF-8")
+//        logger.quiet "=============================="
+//
+//        def devicesOutput = standardOutput.toString("UTF-8")
+//
+//        logger.quiet "=============================="
+//        devicesOutput.eachLine { line, count ->
+//            logger.quiet "$count \t $line"
+//
+//            logger.quiet "######"
+//            def matcher = (line =~ /(.*)\s*device\s*product:(.*)\s*model:(.*)\s*device:(.*)/)
+//            if(matcher.matches()) {
+//
+//                logger.quiet "'${matcher.group(0)}'"
+//                logger.quiet "'${matcher.group(1)}'"
+//                logger.quiet "'${matcher.group(2)}'"
+//                logger.quiet "'${matcher.group(3)}'"
+//                logger.quiet "'${matcher.group(4)}'"
+//            }
+//            logger.quiet "######"
+//        }
+//        logger.quiet "=============================="
+//
+//
+//    }
+//}
+//
+//
+//task cdadbg() {
+//    File adbExe = project.android.getAdbExecutable()
+//
+//    def cmd = [adbExe, "devices", "-l"]
+//
+//    def standardOutput = new ByteArrayOutputStream()
+//    def errorOutput = new ByteArrayOutputStream()
+//
+//    doLast {
+//        def proc = cmd.execute()
+//
+//        proc.waitForProcessOutput(standardOutput, errorOutput)
+//
+//        logger.quiet "$adbExe"
+//        logger.quiet "=============================="
+//        logger.quiet standardOutput.toString("UTF-8")
+//        logger.quiet "=============================="
+//
+//        def devicesOutput = standardOutput.toString("UTF-8")
+//
+//        logger.quiet "=============================="
+//        devicesOutput.eachLine { line, count ->
+//            logger.quiet "$count \t $line"
+//
+//            logger.quiet "######"
+//            def matcher = (line =~ /(.*)\s*device\s*product:(.*)\s*model:(.*)\s*device:(.*)/)
+//            if(matcher.matches()) {
+//
+//                logger.quiet "'${matcher.group(0)}'"
+//                logger.quiet "'${matcher.group(1)}'"
+//                logger.quiet "'${matcher.group(2)}'"
+//                logger.quiet "'${matcher.group(3)}'"
+//                logger.quiet "'${matcher.group(4)}'"
+//            }
+//            logger.quiet "######"
+//        }
+//        logger.quiet "=============================="
+//
+//
+//    }
+//}
+//
+//task ttc() {
+//    doLast {
+//        println  "$project.configurations.compile"
+//        if(project.configurations.find({ conf -> return conf.getName().equalsIgnoreCase("androidTestCompiles") }) != null) {
+//            println  "$project.configurations.androidTestCompile"
+//        }
+//        println  "$project.configurations.androidTestImplementation"
 //    }
 //}

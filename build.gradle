@@ -5,7 +5,7 @@ buildscript {
         jcenter()
         mavenCentral()
         mavenLocal()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+//        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         google()
     }
 
@@ -13,6 +13,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
+
         classpath group: "at.woodstick", name: "gradle-pimutdroid-plugin", version: "0.0.1"
 
         pitest group: "org.pitest.plugins", name: "pitest-export-plugin", version: "0.1-SNAPSHOT"
@@ -27,6 +28,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        google()
     }
 }
 
@@ -37,8 +39,9 @@ ext {
     minSdkVersion = 15
     targetSdkVersion = 25
 
-    supportLibVersion = "25.3.0"
-    espressoVersion = "2.2.2"
+    supportLibVersion = "25.4.0"
+    supportTestVersion = "1.0.1"
+    espressoVersion = "3.0.1"
     robolectricVersion = "3.5.1"
 }
 

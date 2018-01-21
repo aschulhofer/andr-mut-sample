@@ -3,10 +3,6 @@ evaluationDependsOn(':app')
 apply plugin: "com.android.application"
 apply plugin: "at.woodstick.pimutdroid"
 
-ext {
-    pimutMaxFirstMutants = project.hasProperty('pimutMaxFirstMutants') ? project.getProperty('pimutMaxFirstMutants') as int : null
-}
-
 pimut {
     pitest {
         pitestVersion = "1.2.2"
@@ -72,16 +68,10 @@ pimut {
         ]
     }
 
-
-
 //    packageDir = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
 //    mutantsDir = "${pitest.reportDir}/debug/$packageDir"
 //    outputDir = "${project.buildDir}/mutres"
-
-    outputMutateAll = true
-//    maxFirstMutants = project.ext.pimutMaxFirstMutants
-//    skipInnerClasses = false
-    outputMutantCreation = false
+//    outputMutantCreation = false
 }
 
 android {
@@ -90,7 +80,7 @@ android {
 
     defaultConfig {
         applicationId project(":app").android.defaultConfig.applicationId
-        testApplicationId project(":app").android.defaultConfig.testApplicationId
+//        testApplicationId project(":app").android.defaultConfig.testApplicationId
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -143,220 +133,3 @@ dependencies {
 
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
 }
-
-//task("tmutateAll") {
-//    doLast {
-//        def gs = new GroovyShell()
-//
-//        gs.run(
-//            file("src/main/groovy/hw.groovy"),
-//            [
-//                file("../gradlew.bat").path,
-//                getNumberMutants().toString(),
-//                true.toString()
-//            ]
-//        )
-//    }
-//}
-//
-//
-//task amt {
-//    doLast {
-//        println "Ouput dir: ${pimut.outputDir}"
-//
-//        def resultFile = project.fileTree(dir: "${pimut.outputDir}/debug", include: "*.xml").first()
-//
-//        def resultXml = new XmlSlurper().parse(resultFile)
-//
-//        def numTests    = resultXml['@tests']
-//        def numFailures = resultXml['@failures']
-//        def numErrors   = resultXml['@errors']
-//        def numSkipped  = resultXml['@skipped']
-//
-//        println "Result file: ${resultFile.getName()}"
-//        println "Test: ${numTests}, failures: ${numFailures}, errors: ${numErrors}, skipped: ${numSkipped}"
-//    }
-//}
-//
-//gradle.taskGraph.whenReady { graph ->
-//
-//    def mutantTasks = graph.getAllTasks().findAll {
-//        it.name.startsWith("mutant")
-//    }
-//
-//    mutantTasks.each { println it.name }
-//
-//    if(!mutantTasks.isEmpty()) {
-//        project.tasks.mutateAfterCompile.enabled = false
-//        project.tasks.afterMutantTest.enabled = false
-//    }
-//}
-//
-//task cicm {
-//    doLast {
-//        FileTree mutantsTask = project.fileTree(
-//            dir: "${pitest.reportDir}/debug",
-//            include: "at/woodstick/mysampleapplication/MainActivity"
-//        )
-//
-//        mutantsTask.each { println "$it"}
-//
-//        println "files"
-//        files("${pitest.reportDir}/debug/at/woodstick/mysampleapplication").asList().each  { println "$it"}
-//
-//        println " "
-//        println "file"
-//        file("${pitest.reportDir}/debug/at/woodstick/mysampleapplication").listFiles().each { println it }
-//
-//        println " "
-//        println "file \\\$"
-//        file("${pitest.reportDir}/debug/at/woodstick/mysampleapplication").listFiles()
-//        .findAll { file ->
-//            print file.getName()
-//            if(file.getName().matches(/(.*)\$(.*)/)) {
-//                println "\t- matches"
-//                return file
-//            }
-//            else {
-//                println "\t - no match"
-//            }
-//        }
-//        .each { file ->
-//
-//            def parentClassName = file.getName().replaceAll(/\$(.*)/, "");
-//            def moveTarget = file.getParentFile().toPath().resolve(parentClassName)
-//
-//            println "$file \t ${file.getName()} \t ${moveTarget}"
-//
-//            copy {
-//                from file.getParentFile()
-//                into moveTarget
-//                include file.getName() + "/**"
-//            }
-//
-//            file.deleteDir()
-//        }
-//    }
-//
-//}
-//
-//task devt {
-//    doLast {
-//
-//        def extensionTargetMutants = ["at.woodstick.mysampleapplication.DisplayMessageActivity", "at.woodstick.mysampleapplication.MainActivity"];
-////        def extensionTargetMutants = []
-//        def mutationClassGlob = "**/mutants/**/*.class"
-//
-//        def includes
-//
-//        if(extensionTargetMutants == null || extensionTargetMutants.empty) {
-//            includes = [mutationClassGlob]
-//        }
-//        else {
-//            includes = extensionTargetMutants.collect { mutantGlob ->
-//                mutantGlob = mutantGlob.replaceAll("\\.", "/") + "/" + mutationClassGlob
-//                mutantGlob
-//            }
-//        }
-//
-//        println "Include mutants $includes"
-//
-//        FileTree mutantsTask = project.fileTree(
-//            dir: "${pitest.reportDir}/debug",
-//            includes: includes
-//        )
-//
-//        mutantsTask.each { println "$it"}
-//    }
-//
-//}
-//
-//task cdadb(type: Exec) {
-//    File adbExe = project.android.getAdbExecutable()
-//
-//    commandLine adbExe, "devices", "-l"
-//
-//    standardOutput = new ByteArrayOutputStream()
-//
-//    doLast {
-//        logger.quiet "$adbExe"
-//        logger.quiet "=============================="
-//        logger.quiet standardOutput.toString("UTF-8")
-//        logger.quiet "=============================="
-//
-//        def devicesOutput = standardOutput.toString("UTF-8")
-//
-//        logger.quiet "=============================="
-//        devicesOutput.eachLine { line, count ->
-//            logger.quiet "$count \t $line"
-//
-//            logger.quiet "######"
-//            def matcher = (line =~ /(.*)\s*device\s*product:(.*)\s*model:(.*)\s*device:(.*)/)
-//            if(matcher.matches()) {
-//
-//                logger.quiet "'${matcher.group(0)}'"
-//                logger.quiet "'${matcher.group(1)}'"
-//                logger.quiet "'${matcher.group(2)}'"
-//                logger.quiet "'${matcher.group(3)}'"
-//                logger.quiet "'${matcher.group(4)}'"
-//            }
-//            logger.quiet "######"
-//        }
-//        logger.quiet "=============================="
-//
-//
-//    }
-//}
-//
-//
-//task cdadbg() {
-//    File adbExe = project.android.getAdbExecutable()
-//
-//    def cmd = [adbExe, "devices", "-l"]
-//
-//    def standardOutput = new ByteArrayOutputStream()
-//    def errorOutput = new ByteArrayOutputStream()
-//
-//    doLast {
-//        def proc = cmd.execute()
-//
-//        proc.waitForProcessOutput(standardOutput, errorOutput)
-//
-//        logger.quiet "$adbExe"
-//        logger.quiet "=============================="
-//        logger.quiet standardOutput.toString("UTF-8")
-//        logger.quiet "=============================="
-//
-//        def devicesOutput = standardOutput.toString("UTF-8")
-//
-//        logger.quiet "=============================="
-//        devicesOutput.eachLine { line, count ->
-//            logger.quiet "$count \t $line"
-//
-//            logger.quiet "######"
-//            def matcher = (line =~ /(.*)\s*device\s*product:(.*)\s*model:(.*)\s*device:(.*)/)
-//            if(matcher.matches()) {
-//
-//                logger.quiet "'${matcher.group(0)}'"
-//                logger.quiet "'${matcher.group(1)}'"
-//                logger.quiet "'${matcher.group(2)}'"
-//                logger.quiet "'${matcher.group(3)}'"
-//                logger.quiet "'${matcher.group(4)}'"
-//            }
-//            logger.quiet "######"
-//        }
-//        logger.quiet "=============================="
-//
-//
-//    }
-//}
-//
-//task ttc() {
-//    doLast {
-//        println  "$project.configurations.compile"
-//        if(project.configurations.find({ conf -> return conf.getName().equalsIgnoreCase("androidTestCompiles") }) != null) {
-//            println  "$project.configurations.androidTestCompile"
-//        }
-//        println  "$project.configurations.androidTestImplementation"
-//    }
-//}

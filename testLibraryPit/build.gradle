@@ -14,12 +14,12 @@ pimut {
 
         // Not needed when project.group property is set
 //        targetClasses = ["at.woodstick.mysampleapplication.*"]
-        targetClasses = [
-//            "at.woodstick.mysampleapplication.GSampleActivity",
-//            "at.woodstick.mysampleapplication.MainActivity",
-
-            "at.woodstick.mysampleapplication.*",
-        ]
+//        targetClasses = [
+////            "at.woodstick.mysampleapplication.GSampleActivity",
+////            "at.woodstick.mysampleapplication.MainActivity",
+//
+//            "at.woodstick.mysampleapplication.*",
+//        ]
 
         targetTests = ["at.woodstick.mysampleapplication.*"]
 
@@ -47,6 +47,32 @@ pimut {
         maxMutationsPerClass = 0
     }
 
+    buildConfiguration {
+        env1 {
+            targetMutants = ["at.woodstick.mysampleapplication.MainActivity"]
+        }
+
+        env2 {
+            targetMutants = ["at.woodstick.mysampleapplication.GSampleActivity"]
+        }
+
+        env3 {
+            targetMutants = ["at.woodstick.mysampleapplication.DisplayMessageActivity"]
+        }
+
+        env4 {
+            targetMutants = ["at.woodstick.mysampleapplication.util.*"]
+        }
+
+        env5 {
+            targetMutants = []
+        }
+
+        env6 {
+
+        }
+    }
+
     instrumentationTestOptions {
         targetTests {
             packages = [
@@ -63,15 +89,14 @@ pimut {
 //            "at.woodstick.mysampleapplication.MainActivity",
 
 //            "at.woodstick.mysampleapplication.MainActivity",
-//            "at.woodstick.mysampleapplication.util.*",
             "at.woodstick.mysampleapplication.*",
+//            "at.woodstick.mysampleapplication.util.*",
         ]
     }
 
 //    packageDir = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
 //    mutantsDir = "${pitest.reportDir}/debug/$packageDir"
 //    outputDir = "${project.buildDir}/mutres"
-//    outputMutantCreation = false
 }
 
 android {
@@ -133,3 +158,12 @@ dependencies {
 
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
 }
+
+//import at.woodstick.pimutdroid.task.AfterMutationTask
+//task customAfterMutation(type: AfterMutationTask) {
+//    outputDir = "${project.buildDir}/mutres"
+//
+//    doLast {
+//        println "My after mutation task"
+//    }
+//}

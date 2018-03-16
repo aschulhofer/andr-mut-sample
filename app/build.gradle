@@ -14,10 +14,43 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+    flavorDimensions "mdefault"
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+//            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+
+        murli {
+            minifyEnabled false
+//            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+
+        murliDebug {
+            minifyEnabled false
+//            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+
+    testBuildType "murli"
+
+    productFlavors {
+        free {
+            dimension "mdefault"
+//            applicationId 'at.woodsick.mysampleapplication.free'
+
+            applicationIdSuffix ".free"
+            versionNameSuffix "-free"
+        }
+
+
+        free2 {
+            dimension "mdefault"
+            applicationId "at.woodsick.mysampleapplication.free2"
+
+//            applicationIdSuffix ".free2"
+            versionNameSuffix "-free2"
         }
     }
 

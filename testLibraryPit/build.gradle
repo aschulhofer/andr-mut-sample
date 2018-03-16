@@ -1,20 +1,23 @@
 evaluationDependsOn(':app')
 
 apply plugin: "com.android.application"
-apply plugin: "at.woodstick.pimutdroid"
+//apply plugin: "at.woodstick.pimutdroid"
 
-pimut {
-    pitest {
+apply plugin: 'pl.droidsonroids.pitest'
+
+pitest {
+
+
 
 //        Note, the functionality provided by pitest-export plugin is now built into pitest as of release 1.3.0
-//         pitestVersion = "1.2.2"
+         pitestVersion = "1.2.2"
 
-        mainSourceSets = [project(":app").android.sourceSets.main]
+    mainSourceSets = [project(":app").android.sourceSets.main]
 
-        // Not supported in pit gradle plugin android fork
+    // Not supported in pit gradle plugin android fork
 //    testSourceSets = [project(":app").android.sourceSets.test]
 
-        // Not needed when project.group property is set
+    // Not needed when project.group property is set
 //        targetClasses = ["at.woodstick.mysampleapplication.*"]
 //        targetClasses = [
 ////            "at.woodstick.mysampleapplication.GSampleActivity",
@@ -23,9 +26,11 @@ pimut {
 //            "at.woodstick.mysampleapplication.*",
 //        ]
 
-        targetTests = ["at.woodstick.mysampleapplication.*"]
+    targetClasses = ["at.woodstick.mysampleapplication.MainActivity"]
 
-        mutators = [
+    targetTests = ["at.woodstick.mysampleapplication.*"]
+
+    mutators = [
             "INCREMENTS",
             "VOID_METHOD_CALLS",
             "RETURN_VALS",
@@ -34,72 +39,124 @@ pimut {
             "INVERT_NEGS",
             "CONDITIONALS_BOUNDARY",
             "REMOVE_CONDITIONALS"
-        ]
+    ]
 
-        exportLineCoverage = true
+    exportLineCoverage = true
 
-        outputFormats = ["XML", "HTML"]
+    outputFormats = ["XML", "HTML"]
 
-        threads = 4
+    threads = 4
 
-        verbose = true
+    verbose = true
 
-        reportDir = "${project.reporting.baseDir.path}/pitest/custom"
+    reportDir = "${project.reporting.baseDir.path}/pitest/custom"
 
-        maxMutationsPerClass = 0
-    }
+//        maxMutationsPerClass = 0
+    maxMutationsPerClass = 2
+}
 
-    buildConfiguration {
-        env1 {
-            targetMutants = ["at.woodstick.mysampleapplication.MainActivity"]
-        }
-
-        env2 {
-            targetMutants = ["at.woodstick.mysampleapplication.GSampleActivity"]
-        }
-
-        env3 {
-            targetMutants = ["at.woodstick.mysampleapplication.DisplayMessageActivity"]
-        }
-
-        env4 {
-            targetMutants = ["at.woodstick.mysampleapplication.util.*"]
-        }
-
-        env5 {
-            targetMutants = []
-        }
-
-        env6 {
-
-        }
-    }
-
-    instrumentationTestOptions {
-        targetTests {
+//pimut {
+//    pitest {
+//
+////        Note, the functionality provided by pitest-export plugin is now built into pitest as of release 1.3.0
+////         pitestVersion = "1.2.2"
+//
+//        mainSourceSets = [project(":app").android.sourceSets.main]
+//
+//        // Not supported in pit gradle plugin android fork
+////    testSourceSets = [project(":app").android.sourceSets.test]
+//
+//        // Not needed when project.group property is set
+////        targetClasses = ["at.woodstick.mysampleapplication.*"]
+////        targetClasses = [
+//////            "at.woodstick.mysampleapplication.GSampleActivity",
+//////            "at.woodstick.mysampleapplication.MainActivity",
+////
+////            "at.woodstick.mysampleapplication.*",
+////        ]
+//
+//        targetTests = ["at.woodstick.mysampleapplication.*"]
+//
+//        mutators = [
+//            "INCREMENTS",
+//            "VOID_METHOD_CALLS",
+//            "RETURN_VALS",
+//            "MATH",
+//            "NEGATE_CONDITIONALS",
+//            "INVERT_NEGS",
+//            "CONDITIONALS_BOUNDARY",
+//            "REMOVE_CONDITIONALS"
+//        ]
+//
+//        exportLineCoverage = true
+//
+//        outputFormats = ["XML", "HTML"]
+//
+//        threads = 4
+//
+//        verbose = true
+//
+//        reportDir = "${project.reporting.baseDir.path}/pitest/custom"
+//
+////        maxMutationsPerClass = 0
+//        maxMutationsPerClass = 1
+//    }
+//
+//    buildConfiguration {
+//        env1 {
+//            targetMutants = ["at.woodstick.mysampleapplication.MainActivity"]
+//        }
+//
+//        env2 {
+//            targetMutants = ["at.woodstick.mysampleapplication.GSampleActivity"]
+//        }
+//
+//        env3 {
+//            targetMutants = ["at.woodstick.mysampleapplication.DisplayMessageActivity"]
+//        }
+//
+//        env4 {
+//            targetMutants = ["at.woodstick.mysampleapplication.util.*"]
+//            maxMutationsPerClass = 1
+//        }
+//
+//        env5 {
+//            targetMutants = []
+//        }
+//
+//        env6 {
+//
+//        }
+//    }
+//
+//    instrumentationTestOptions {
+//        targetTests {
 //            packages = [
 //                "at.woodstick.mysampleapplication.espresso",
 //            ]
-            classes = [
-                "at.woodstick.mysampleapplication.espresso.MainActivityTest",
-//                "at.woodstick.mysampleapplication.espresso.DisplayMessageActivityTest",
-            ]
-        }
-
-        targetMutants = [
-//            "at.woodstick.mysampleapplication.GSampleActivity",
+////            classes = [
+////                "at.woodstick.mysampleapplication.espresso.MainActivityTest",
+////                "at.woodstick.mysampleapplication.espresso.DisplayMessageActivityTest",
+////            ]
+//        }
+//
+//        targetMutants = [
+////            "at.woodstick.mysampleapplication.GSampleActivity",
+////            "at.woodstick.mysampleapplication.MainActivity",
+//
 //            "at.woodstick.mysampleapplication.MainActivity",
-
-            "at.woodstick.mysampleapplication.MainActivity",
-//            "at.woodstick.mysampleapplication.*",
-//            "at.woodstick.mysampleapplication.util.*",
-        ]
-    }
-
-//    packageDir = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
-//    mutantsDir = "${pitest.reportDir}/debug/$packageDir"
-//    outputDir = "${project.buildDir}/mutres"
-}
+////            "at.woodstick.mysampleapplication.*",
+////            "at.woodstick.mysampleapplication.util.*",
+//        ]
+//    }
+//
+//    applicationId = "at.woodstick.mysampleapplication.def.free"
+//    productFlavor = "free"
+//
+////    packageDir = project(":app").android.defaultConfig.applicationId.replaceAll("\\.", "/")
+////    mutantsDir = "${pitest.reportDir}/debug/$packageDir"
+////    outputDir = "${project.buildDir}/mutres"
+//}
 
 //def mutantEnv = project.hasProperty("mprofile") ? project.getProperty("mprofile") : "default"
 //
@@ -115,6 +172,7 @@ android {
     defaultConfig {
         applicationId project(":app").android.defaultConfig.applicationId
 //        testApplicationId project(":app").android.defaultConfig.testApplicationId
+        applicationIdSuffix ".def"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -122,6 +180,35 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+
+
+    buildTypes {
+        murli {
+            minifyEnabled true
+        }
+    }
+
+    testBuildType "debug"
+
+    flavorDimensions "mdefault"
+    productFlavors {
+        free {
+            dimension "mdefault"
+            applicationIdSuffix ".free"
+            versionNameSuffix "-free"
+        }
+
+        free2 {
+            dimension "mdefault"
+
+            applicationId  project(":app").android.defaultConfig.applicationId + ".free2"
+
+            applicationIdSuffix ".free3"
+            versionNameSuffix "-free2"
+        }
+    }
+
     sourceSets {
         main {
             res.srcDirs("../app/src/main/res")
@@ -176,3 +263,38 @@ dependencies {
 //        println "My after mutation task"
 //    }
 //}
+
+task getAppId() {
+    doLast {
+
+        if(!project.android.getProductFlavors().isEmpty()) {
+            def freeFlav = project.android.getProductFlavors().getAt("free")
+
+            println freeFlav.getName()
+            println freeFlav.getApplicationId()
+            println freeFlav.getTestApplicationId()
+            println freeFlav.getApplicationIdSuffix()
+            println "=============================================="
+        }
+
+        project.android.applicationVariants.all { variant ->
+
+            println variant.getName()
+            println variant.getApplicationId()
+            println variant.getDirName()
+            println variant.getAssemble()
+            println variant.getFlavorName()
+            println variant.getBuildType().getName()
+            println variant.getMergedFlavor().getTestInstrumentationRunner()
+            println variant.getMergedFlavor().getName()
+            println variant.getMergedFlavor().getApplicationId()
+            println variant.getMergedFlavor().getTestApplicationId()
+            println "=============================================="
+
+//            println variant.buildType.applicationIdSuffix
+
+//            def applicationId = [variant.mergedFlavor.applicationId, variant.buildType.applicationIdSuffix].findAll().join()
+//            println "AppID: ${applicationId}"
+        }
+    }
+}

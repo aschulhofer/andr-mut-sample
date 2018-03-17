@@ -1,31 +1,28 @@
 package at.woodstick.mysampleapplication.robolectric;
 
 
-
 import android.app.Activity;
-import android.content.Context;
-import android.content.res.Configuration;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.widget.Button;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowApplication;
 
-import java.util.Locale;
-
-import at.woodstick.mysampleapplication.BuildConfig;
+import at.woodstick.mysampleapplication.GSampleActivity;
 import at.woodstick.mysampleapplication.MainActivity;
 import at.woodstick.mysampleapplication.R;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 /**
- * TODO: FIX ROBOLECTRIC after studio, build tools and gradle upgrade
- *
  * If encountering error
  *
  * No such manifest file: build\intermediates\bundles\debug\AndroidManifest.xml
@@ -35,8 +32,7 @@ import at.woodstick.mysampleapplication.R;
  * Run > Edit Configurations.. > Defaults > Android JUnit
  * Working Directory: $MODULE_DIR$
  */
-//@RunWith(RobolectricTestRunner.class)
-//@Config(constants = BuildConfig.class)
+@RunWith(RobolectricTestRunner.class)
 public class MainActivityTest {
 
     private MainActivity mainActivity;
@@ -48,44 +44,40 @@ public class MainActivityTest {
         mainActivityResources = mainActivity.getResources();
     }
 
-    //@Test
+    @Test
     @Config(qualifiers = "de")
-    public void shouldCheckGermanButtonText() {
-        Button gsampleButton = getViewById(mainActivity, R.id.start_gsample_button);
+    public void gsampleStartButton_germanText_shouldBeCorrect() {
+        Button gsampleButton = getViewById(R.id.start_gsample_button);
 
         String actualGSampleButtonText = (String)gsampleButton.getText();
-        String expectedGSampleButtonText = mainActivity.getResources().getString(R.string.button_start_gsample);
+        String expectedGSampleButtonText = mainActivityResources.getString(R.string.button_start_gsample);
 
-        Assert.assertEquals("GSample starten", actualGSampleButtonText);
-        Assert.assertEquals(expectedGSampleButtonText, actualGSampleButtonText);
+        assertThat(actualGSampleButtonText, is("GSample starten"));
+        assertThat(actualGSampleButtonText, is(expectedGSampleButtonText));
     }
 
-    /**
-     * @param language
-     * @deprecated not working with robolectric use {@link org.robolectric.annotation.Config}  qualifier = "&lt;locale&gt;
-     */
-    @Deprecated
-    public void setLocale(String language) {
-        setLocale(language, "");
+    @Test
+    public void gsampleStartButton_click_shouldStartCorrectIntent() {
+        Button gsampleButton = getViewById(R.id.start_gsample_button);
+        gsampleButton.performClick();
+
+        Intent actualIntent = ShadowApplication.getInstance().getNextStartedActivity();
+        Intent expectedIntent = new Intent(mainActivity, GSampleActivity.class);
+        ComponentName expectedComponent = new ComponentName(mainActivity, GSampleActivity.class);
+
+        assertThat(actualIntent.getComponent().getPackageName(), is(expectedIntent.getComponent().getPackageName()));
+        assertThat(actualIntent.getComponent().getClassName(), is(expectedIntent.getComponent().getClassName()));
+
+        assertThat(actualIntent.getComponent(), is(expectedComponent));
+        assertThat(actualIntent.getComponent().getPackageName(), is(mainActivity.getPackageName()));
+        assertThat(actualIntent.getComponent().getClassName(), is(GSampleActivity.class.getName()));
     }
 
-    /**
-     * @param language
-     * @param country
-     * @deprecated not working with robolectric use {@link org.robolectric.annotation.Config} qualifier = "&lt;locale&gt;"
-     */
-    @Deprecated
-    public void setLocale(String language, String country) {
-        Locale locale = new Locale(language, country);
-        Locale.setDefault(locale);
-
-        Configuration config = mainActivityResources.getConfiguration();
-        config.locale = locale;
-        mainActivityResources.updateConfiguration(config, mainActivityResources.getDisplayMetrics());
+    public <T> T getViewById(int viewId) {
+        return getViewById(mainActivity, viewId);
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T getViewById(Activity activity, int id) {
-        return (T) activity.findViewById(id);
+    public static <T> T getViewById(Activity activity, int viewId) {
+        return (T) activity.findViewById(viewId);
     }
 }

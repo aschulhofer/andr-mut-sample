@@ -14,11 +14,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Bitmap testBimap = Bitmap.createBitmap(100,100, Bitmap.Config.ARGB_8888);
-        Bitmap.Config config = testBimap.getConfig();
-
-
     }
 
     public void startGSample(View view) {

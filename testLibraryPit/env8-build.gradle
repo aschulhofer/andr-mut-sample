@@ -1,5 +1,0 @@
-pimut.buildConfiguration {
-    env8 {
-        targetMutants = ["at.woodstick.mysampleapplication.MainActivity"]
-    }
-}

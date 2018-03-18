@@ -52,9 +52,6 @@ dependencies {
     androidTestImplementation "com.android.support.test.espresso:espresso-intents:$espressoVersion"
 }
 
-task wat {
-    doLast {
-        println System.getProperty("MODULE_DIR")
-        println systemProperty "MODULE_DIR"
-    }
+task cleanReportDir(type: Delete, group: 'report') {
+    delete "${project.buildDir}/reports"
 }

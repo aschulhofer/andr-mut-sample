@@ -24,26 +24,40 @@ pimut {
 }
 
 // Fix for robolectric manifest not found on pitest tasks
-gradle.taskGraph.whenReady { graph ->
-    def pitestTasks = graph.allTasks.findAll { task ->
-        task.getName().startsWith("pitest")
+android.applicationVariants.all { variant ->
+    println variant.name.capitalize()
+
+    def variantMatcher = (variant.name =~ /([A-Z]?[^A-Z]*)/)
+    List<String> variantPaths = []
+    while(variantMatcher.find()) {
+        variantPaths.add(variantMatcher.group().toLowerCase())
     }
+    def variantPath = variantPaths.join("/")
 
-    pitestTasks.each { task ->
-        def variantMatcher = (task.getName().replace("pitest", "") =~ /([A-Z]?[^A-Z]*)/)
+    def taskName = "copyRobolectricResourcesForPitest${variant.name.capitalize()}"
 
-        List<String> variantPaths = []
-        while(variantMatcher.find()) {
-            variantPaths.add(variantMatcher.group().toLowerCase())
+    def sourceFile = "${projectDir}/src/robolectric/resources/robolectric.properties"
+    def targetPath = "${buildDir}/intermediates/sourceFolderJavaResources/test/${variantPath}"
+
+    println "Add ${taskName} to opy robolectric.properties from ($sourceFile) into $targetPath"
+
+    project.task([type: Copy, group: 'build'], taskName) {
+        from sourceFile
+        into targetPath
+    }
+}
+
+project.afterEvaluate {
+    println "Project: ${project.name} evaluated"
+
+    project.getTasks().each { Task task ->
+        if (task.getName().startsWith("pitest") && !task.getName().equals("pitest")) {
+            println "Task: ${task.name}"
+
+            def variant = task.getName().replace("pitest", "")
+            println "Variant: $variant"
+
+            task.dependsOn project.tasks.getByName("copyRobolectricResourcesForPitest$variant")
         }
-        def variantPath = variantPaths.join("/")
-        def targetPath = "${buildDir}/intermediates/sourceFolderJavaResources/test/${variantPath}"
-
-        project.copy {
-            from 'src/robolectric/resources/robolectric.properties'
-            into targetPath
-        }
-
-        println "Add robolectric.properties to $targetPath"
     }
 }

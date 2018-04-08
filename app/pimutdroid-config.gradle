@@ -2,7 +2,7 @@ apply plugin: "at.woodstick.pimutdroid"
 
 pimut {
     pitest {
-        failWhenNoMutations = true
+        failWhenNoMutations = false
         exportLineCoverage = true
         outputFormats = ["XML", "HTML"]
         timeoutConstInMillis = 15000
@@ -21,11 +21,57 @@ pimut {
             "REMOVE_CONDITIONALS"
         ]
     }
+
+    buildConfiguration {
+        standard {
+            targetMutants = [
+                "at.woodstick.mysampleapplication.*"
+            ]
+        }
+
+        utils {
+            targetMutants = [
+                "at.woodstick.mysampleapplication.util.*"
+            ]
+            mutators = [
+                "NEGATE_CONDITIONALS",
+                "REMOVE_CONDITIONALS"
+            ]
+            maxMutationsPerClass = 5
+        }
+
+        mainActivity {
+            targetMutants = [
+                "at.woodstick.mysampleapplication.MainActivity"
+            ]
+            mutators = [
+                "VOID_METHOD_CALLS",
+            ]
+            maxMutationsPerClass = 2
+        }
+
+        activities {
+            targetMutants = [
+                "at.woodstick.mysampleapplication.MainActivity",
+                "at.woodstick.mysampleapplication.GSampleActivity",
+                "at.woodstick.mysampleapplication.DisplayMessageActivity",
+            ]
+        }
+    }
+
+    instrumentationTestOptions {
+        targetMutants = [
+            "at.woodstick.mysampleapplication.*"
+        ]
+    }
+
+    expectedTestResultFilename = "${project.name}-expected-test-result.xml"
+//    mutantTestResultFilename = "adb-test-report.xml"
 }
 
 // Fix for robolectric manifest not found on pitest tasks
 android.applicationVariants.all { variant ->
-    println variant.name.capitalize()
+    logger.debug variant.name.capitalize()
 
     def variantMatcher = (variant.name =~ /([A-Z]?[^A-Z]*)/)
     List<String> variantPaths = []
@@ -39,7 +85,7 @@ android.applicationVariants.all { variant ->
     def sourceFile = "${projectDir}/src/robolectric/resources/robolectric.properties"
     def targetPath = "${buildDir}/intermediates/sourceFolderJavaResources/test/${variantPath}"
 
-    println "Add ${taskName} to opy robolectric.properties from ($sourceFile) into $targetPath"
+    logger.debug "Add ${taskName} to copy robolectric.properties from ($sourceFile) into $targetPath"
 
     project.task([type: Copy, group: 'build'], taskName) {
         from sourceFile
@@ -48,14 +94,14 @@ android.applicationVariants.all { variant ->
 }
 
 project.afterEvaluate {
-    println "Project: ${project.name} evaluated"
+    logger.debug "Project: ${project.name} evaluated"
 
     project.getTasks().each { Task task ->
         if (task.getName().startsWith("pitest") && !task.getName().equals("pitest")) {
-            println "Task: ${task.name}"
+            logger.debug "Task: ${task.name}"
 
             def variant = task.getName().replace("pitest", "")
-            println "Variant: $variant"
+            logger.debug "Variant: $variant"
 
             task.dependsOn project.tasks.getByName("copyRobolectricResourcesForPitest$variant")
         }
